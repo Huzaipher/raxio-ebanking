@@ -1,0 +1,133 @@
+/*
+    dashboard.css - the admin dashboard layout (Folder 9: Admin Dashboard).
+    In the lecture a free admin template was downloaded and its assets copied into static/. Here we write a small dashboard layout of our own
+    with the same parts: a dark sidebar on the left, a top bar with a breadcrumb, stat cards, and striped tables.
+    base.html links this file with {% static 'css/dashboard.css' %}.
+*/
+
+/* ---------------------------------------------------------------------------
+   LAYOUT
+   When someone is logged in, base.html adds the class "with-sidebar" to <body>.
+   The sidebar is fixed on the left and the main area is pushed to the right by the same width.
+--------------------------------------------------------------------------- */
+:root { --sidebar-width: 250px; }
+
+.with-sidebar .main { margin-left: var(--sidebar-width); min-height: 100vh; }
+
+/* ---------------------------------------------------------------------------
+   SIDEBAR
+--------------------------------------------------------------------------- */
+.sidenav {
+    position: fixed; top: 0; bottom: 0; left: 0; z-index: 20;
+    width: var(--sidebar-width); box-sizing: border-box;
+    background: linear-gradient(195deg, #34495e, #1c2833);
+    color: #fff; padding: 18px 14px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 6px;
+}
+
+/* the logo and system name at the top of the sidebar */
+.sidenav-brand { display: flex; flex-direction: column; gap: 8px; color: #fff; text-decoration: none; padding: 4px 6px 14px; border-bottom: 1px solid rgba(255,255,255,0.15); }
+.sidenav-brand img { width: 100%; height: auto; border-radius: 8px; background: #fff; }
+.sidenav-brand span { font-weight: bold; font-size: 0.95em; line-height: 1.3; }
+
+/* small grey headings that group the links (Main, Customers, Loans...) */
+.sidenav-heading { margin: 14px 8px 4px; font-size: 0.7em; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.55); }
+
+/* the list of links */
+.sidenav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.nav-link { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 6px; color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9em; }
+.nav-link:hover { background: rgba(255,255,255,0.1); color: #fff; }
+/* the page you are on is highlighted (base.html adds the "active" class) */
+.nav-link.active { background: #2980b9; color: #fff; font-weight: bold; box-shadow: 0 3px 8px rgba(0,0,0,0.25); }
+.nav-icon { width: 22px; text-align: center; }
+
+/* ---------------------------------------------------------------------------
+   TOP BAR
+   The breadcrumb (Pages / page name) on the left, the user and the Logout button on the right.
+--------------------------------------------------------------------------- */
+.topbar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; padding: 14px 20px; background: #fff; border-bottom: 1px solid #dfe6e9; }
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.breadcrumb { font-size: 0.9em; color: #7f8c8d; }
+.breadcrumb strong { color: #2c3e50; }
+.topbar-right { display: flex; align-items: center; gap: 12px; font-size: 0.9em; }
+.topbar-right form { margin: 0; }
+
+/* the Menu button only shows on small screens, where the sidebar is hidden until you open it */
+.menu-toggle { display: none; background: #2c3e50; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+/* ---------------------------------------------------------------------------
+   STAT CARDS on the dashboard (home.html)
+   Each card shows one number counted from the database.
+--------------------------------------------------------------------------- */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px; margin-bottom: 30px; }
+.stat-card { background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; color: inherit; text-decoration: none; }
+.stat-card:hover { box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+.stat-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.stat-label { font-size: 0.85em; color: #7f8c8d; }
+.stat-value { font-size: 1.6em; font-weight: bold; color: #2c3e50; font-variant-numeric: tabular-nums; }
+/* the coloured square with the icon in the corner of each card */
+.stat-icon { width: 44px; height: 44px; border-radius: 8px; display: grid; place-items: center; font-size: 1.3em; color: #fff; flex: none; }
+.stat-icon.blue { background: #2980b9; }
+.stat-icon.green { background: #27ae60; }
+.stat-icon.orange { background: #e67e22; }
+.stat-icon.dark { background: #2c3e50; }
+/* the small line under the number, separated by a thin border */
+.stat-note { font-size: 0.8em; color: #7f8c8d; border-top: 1px solid #ecf0f1; padding-top: 8px; margin-top: 4px; }
+
+/* ---------------------------------------------------------------------------
+   TABLES
+   Like the lecture, tables use the classes "table table-striped".
+   table          - full width with spacing (the base rules are in style.css)
+   table-striped  - every other row gets a light background so long lists are easy to follow
+--------------------------------------------------------------------------- */
+.table { width: 100%; }
+.table-striped tbody tr:nth-of-type(odd) { background: #f5f8fa; }
+.table-striped tbody tr:hover { background: #eaf2f8; }
+
+/* ---------------------------------------------------------------------------
+   SMALL SCREENS (phones and small tablets)
+   The sidebar slides off the left edge. The Menu button adds the class "sidebar-open" to <body> (see dashboard.js) to slide it back in.
+--------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+    .with-sidebar .main { margin-left: 0; }
+    .sidenav { transform: translateX(-100%); transition: transform 0.2s ease; }
+    .sidebar-open .sidenav { transform: translateX(0); box-shadow: 4px 0 16px rgba(0,0,0,0.3); }
+    .menu-toggle { display: inline-block; }
+}
+@media (prefers-reduced-motion: reduce) { .sidenav { transition: none; } }
+
+/* ---------------------------------------------------------------------------
+   ROW ACTION ICONS (View / Edit / Delete on every records page)
+   Each icon is a small square button. The SVG lines take their colour from "color" through stroke: currentColor.
+--------------------------------------------------------------------------- */
+.icon-actions { display: flex; align-items: center; gap: 6px; }
+.icon-actions form { margin: 0; }
+.icon-btn { width: 32px; height: 32px; display: inline-grid; place-items: center; border-radius: 6px; border: 1px solid #dfe6e9; background: #fff; cursor: pointer; padding: 0; }
+.icon-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn.view { color: #2980b9; }
+.icon-btn.edit { color: #27ae60; }
+.icon-btn.delete { color: #c0392b; }
+.icon-btn:hover { background: currentColor; }
+/* on hover the square fills with the icon's colour, so the lines turn white */
+.icon-btn:hover svg { stroke: #fff; }
+.icon-btn:focus-visible { outline: 3px solid #85c1e9; outline-offset: 1px; }
+
+/* ---------------------------------------------------------------------------
+   POPUPS (the <dialog> elements in base.html)
+   The padding is on .popup-inner, not on the dialog, so popups.js can tell a click outside the white box from a click inside it.
+--------------------------------------------------------------------------- */
+.popup { border: none; border-radius: 10px; padding: 0; width: min(760px, calc(100% - 32px)); max-height: calc(100vh - 48px); box-shadow: 0 20px 50px rgba(0,0,0,0.3); color: #333; }
+.popup-small { width: min(420px, calc(100% - 32px)); }
+/* ::backdrop is the dark layer the browser draws behind an open dialog */
+.popup::backdrop { background: rgba(28, 40, 51, 0.55); }
+.popup-inner { padding: 22px 24px; }
+.popup-close { position: absolute; top: 10px; right: 12px; width: 34px; height: 34px; border: none; background: none; font-size: 1.6em; line-height: 1; color: #7f8c8d; cursor: pointer; border-radius: 6px; }
+.popup-close:hover { background: #ecf0f1; color: #2c3e50; }
+.popup h3 { margin: 0 40px 14px 0; color: #2980b9; }
+.popup-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.popup-actions form { margin: 0; }
+.popup-loading { color: #7f8c8d; }
+.popup-error { color: #a71d2a; background: #fdecea; border: 1px solid #f5c6cb; border-radius: 6px; padding: 10px 12px; margin: 0 0 14px; }
+.popup-warning { color: #c0392b; font-size: 0.9em; margin: 0; }
+/* the Save button inside the popup is a normal button, not the full-width green bar used on the add pages */
+.popup .return-btn, .popup .danger-btn { border: none; cursor: pointer; font-size: 0.9em; }

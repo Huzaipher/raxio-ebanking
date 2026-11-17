@@ -1,0 +1,26 @@
+<!--
+    U - Update inside the popup.
+    This template does NOT extend base.html: edit_record_view sends it when the address ends with ?popup=1.
+    data-popup-form tells popups.js to send this form in the background and keep the answer inside the popup.
+      - if the data is valid, the view answers with a redirect and popups.js reloads the records page (which shows "updated successfully")
+      - if not, the view sends this template back with the errors under each field
+-->
+<div class="popup-head">
+    <h3>Edit {{ label }} - {{ record }}</h3>
+</div>
+
+{% if form.errors %}
+<!-- this line only shows after a save that failed -->
+<p class="popup-error">Please correct the errors below.</p>
+{% endif %}
+
+<!-- the ?popup=1 in the action address keeps the view in popup mode when the form is saved -->
+<form method="POST" action="{% url 'edit_record_page' record_type record.id %}?popup=1" data-popup-form>
+    {% csrf_token %}
+    {% include 'includes/form_fields.html' %}
+    <!-- This div holds the Save and Cancel buttons -->
+    <div class="popup-actions">
+        <button type="submit" class="return-btn add-btn">Save Changes</button>
+        <button type="button" class="return-btn" data-popup-close>Cancel</button>
+    </div>
+</form>

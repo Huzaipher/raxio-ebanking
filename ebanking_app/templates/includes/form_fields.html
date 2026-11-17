@@ -1,0 +1,28 @@
+<!--
+    Reusable form layout:
+    Every page includes this file to draw its Django form. It loops over the form's fields and draws each one with its label, input box, help text and errors.
+    Django builds each input from the model: CharField -> text box, DateField -> date picker, choices -> dropdown, ForeignKey -> dropdown of saved records.
+    Pages can pass single_column=True to show the fields in one column (used on the login and sign up pages).
+-->
+
+<!-- non_field_errors are errors that belong to the whole form, e.g. "wrong username or password" -->
+{% if form.non_field_errors %}
+<ul class="errorlist nonfield">
+    {% for error in form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<div class="grid{% if single_column %} single{% endif %}">
+    {% for field in form %}
+    <div class="form-group">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.help_text %}
+        <div class="help-text">{{ field.help_text|safe }}</div>
+        {% endif %}
+        {{ field.errors }}
+    </div>
+    {% endfor %}
+</div>

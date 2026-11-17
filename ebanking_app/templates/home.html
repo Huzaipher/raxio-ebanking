@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}Banking & Loan Management Dashboard{% endblock title %}
+
+{% block extra_css %}
+<!--
+    This is the CSS section for the dashboard only.
+    The shared styles (fonts, sidebar, top bar, stat cards) live in static/css/style.css and static/css/dashboard.css, linked from base.html.
+-->
+<style>
+    /* Dashboard wrapper centers the main content on the page */
+    .dashboard {
+        max-width: 1000px;
+        margin: 10px auto;
+    }
+
+    /* Intro card gives a summary of the system and its purpose */
+    .intro-section {
+        background: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        border-left: 5px solid #2980b9;
+    }
+    .intro-section h2 {
+        color: #2980b9;
+        margin-top: 0;
+    }
+    .intro-section p {
+        line-height: 1.6;
+        color: #555;
+    }
+
+    /* Bullet list styling under the overview section */
+    .capabilities-list {
+        margin-top: 15px;
+        padding-left: 20px;
+    }
+    .capabilities-list li {
+        margin-bottom: 8px;
+        color: #444;
+    }
+
+    /* Grid layout for the dashboard cards */
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    /* Style for each navigation card on the dashboard */
+    .menu-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        text-align: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .menu-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        border-bottom: 4px solid #27ae60;
+    }
+
+    /* Card title inside each dashboard section */
+    .menu-card h3 {
+        color: #2c3e50;
+        margin: 0 0 10px 0;
+    }
+    .menu-card p {
+        color: #7f8c8d;
+        font-size: 0.9em;
+        margin: 0;
+    }
+
+    /* Big emoji icon inside each card */
+    .card-icon {
+        font-size: 2.5em;
+        color: #2980b9;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+    <!--
+        Main content area.
+        This holds the overview section and all dashboard cards.
+        The sidebar, the breadcrumb and the Logout button come from base.html.
+    -->
+    <div class="dashboard">
+
+            <!--
+                Stat cards section (Admin Dashboard lecture):
+                each card shows one number that home_view counted from the database, and clicking it opens that table's records page.
+                floatformat:"2g" shows money with 2 decimal places and commas, e.g. 1,250,000.00
+                pluralize adds an "s" when the number is not 1, e.g. "1 account" but "3 accounts"
+            -->
+            <div class="stat-grid">
+                <a href="{% url 'record_list_page' 'customer' %}" class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Customers</span>
+                        <span class="stat-icon blue">👤</span>
+                    </div>
+                    <span class="stat-value">{{ customer_count }}</span>
+                    <span class="stat-note">Registered customers</span>
+                </a>
+
+                <a href="{% url 'record_list_page' 'accounts' %}" class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Total Account Balance</span>
+                        <span class="stat-icon green">🏦</span>
+                    </div>
+                    <span class="stat-value">{{ total_balance|floatformat:"2g" }}</span>
+                    <span class="stat-note">Across {{ account_count }} account{{ account_count|pluralize }}</span>
+                </a>
+
+                <a href="{% url 'record_list_page' 'loans' %}" class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Loans</span>
+                        <span class="stat-icon orange">💰</span>
+                    </div>
+                    <span class="stat-value">{{ loan_count }}</span>
+                    <span class="stat-note">{{ pending_loan_count }} pending</span>
+                </a>
+
+                <a href="{% url 'loan_repayment_summary_page' %}" class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Total Repaid</span>
+                        <span class="stat-icon dark">🧾</span>
+                    </div>
+                    <span class="stat-value">{{ total_repaid|floatformat:"2g" }}</span>
+                    <span class="stat-note">From {{ payment_count }} payment{{ payment_count|pluralize }}</span>
+                </a>
+            </div>
+
+            <!-- Overview section explains what the system does -->
+            <div class="intro-section">
+                <h2>System Overview & Capabilities</h2>
+                <p>Welcome to the core administrative dashboard. This centralized system is designed to streamline daily financial operations, manage customer relationships, and track the complete lifecycle of loan products. Key capabilities include:</p>
+                <ul class="capabilities-list">
+                    <li><strong>Customer & Account Management:</strong> Register new clients, capture KYC (Know Your Customer) details, and manage active savings or checking accounts.</li>
+                    <li><strong>Loan Origination:</strong> Process new loan applications, link guarantors, and manage approval statuses, requested amounts, and interest rates.</li>
+                    <li><strong>Repayment Tracking:</strong> Log individual loan payments and maintain real-time repayment summaries to track outstanding balances.</li>
+                    <li><strong>Transaction Processing:</strong> Record daily banking transactions, categorize them by type (e.g., deposits, withdrawals), and map them to customer accounts.</li>
+                    <li><strong>Staff Administration:</strong> Maintain internal records of bank personnel, their departmental assignments, and operational roles.</li>
+                </ul>
+            </div>
+
+            <!--
+                Menu grid section:
+                Each card acts like a shortcut to another page in the system.
+                This is the main navigation area of the dashboard.
+            -->
+            <div class="menu-grid">
+
+                <a href="{% url 'bank_staff_page' %}" class="menu-card">
+                    <div class="card-icon">👥</div>
+                    <h3>Bank Staff</h3>
+                    <p>Manage employee records and roles.</p>
+                </a>
+
+                <a href="{% url 'customer_page' %}" class="menu-card">
+                    <div class="card-icon">👤</div>
+                    <h3>Customers</h3>
+                    <p>Register and update client profiles.</p>
+                </a>
+
+                <a href="{% url 'accounts_page' %}" class="menu-card">
+                    <div class="card-icon">🏦</div>
+                    <h3>Bank Accounts</h3>
+                    <p>Manage account balances and statuses.</p>
+                </a>
+
+                <a href="{% url 'guarantor_page' %}" class="menu-card">
+                    <div class="card-icon">🤝</div>
+                    <h3>Guarantors</h3>
+                    <p>Record loan guarantor information.</p>
+                </a>
+
+                <a href="{% url 'loan_product_page' %}" class="menu-card">
+                    <div class="card-icon">📄</div>
+                    <h3>Loan Products</h3>
+                    <p>Define loan limits and repayment terms.</p>
+                </a>
+
+                <a href="{% url 'loan_request_page' %}" class="menu-card">
+                    <div class="card-icon">📝</div>
+                    <h3>Loan Requests</h3>
+                    <p>Submit and review customer loan applications.</p>
+                </a>
+
+                <a href="{% url 'loan_view_page' %}" class="menu-card">
+                    <div class="card-icon">💰</div>
+                    <h3>Loans</h3>
+                    <p>Disburse loans and track their status.</p>
+                </a>
+
+                <a href="{% url 'loan_approvals_page' %}" class="menu-card">
+                    <div class="card-icon">✅</div>
+                    <h3>Loan Approvals</h3>
+                    <p>Record approval decisions on loans.</p>
+                </a>
+
+                <a href="{% url 'loan_payment_page' %}" class="menu-card">
+                    <div class="card-icon">🧾</div>
+                    <h3>Loan Payments</h3>
+                    <p>Record repayment installments.</p>
+                </a>
+
+                <a href="{% url 'transactions_page' %}" class="menu-card">
+                    <div class="card-icon">💸</div>
+                    <h3>Transactions</h3>
+                    <p>Log deposits, withdrawals, and transfers.</p>
+                </a>
+
+                <a href="{% url 'transaction_types_page' %}" class="menu-card">
+                    <div class="card-icon">⚙️</div>
+                    <h3>Transaction Types</h3>
+                    <p>Define categories for financial movements.</p>
+                </a>
+
+                <a href="{% url 'loan_repayment_summary_page' %}" class="menu-card">
+                    <div class="card-icon">📊</div>
+                    <h3>Repayment Summary</h3>
+                    <p>View aggregate loan balances and progress.</p>
+                </a>
+
+        </div>
+    </div>
+{% endblock content %}

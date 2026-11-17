@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Loan Repayment Summary{% endblock title %}
+{# the page name shown in the top bar breadcrumb: Pages / ... #}
+{% block breadcrumb %}Loan Repayment Summary{% endblock breadcrumb %}
+
+{% block content %}
+    <!-- A simple way to explain it: divs are like containers that group related content together so the page has a clear structure. -->
+    <!-- This div keeps the repayment summary table in one organized card. -->
+    <div class="container">
+        <!-- This div holds the page title and the Return to Home button. -->
+        <div class="top-bar">
+            <h2>Loan Repayment Summary</h2>
+            <a href="{% url 'home_page' %}" class="return-btn">Return to Home</a>
+        </div>
+        <p>Track the aggregate repayment progress and remaining balance of every loan. This page is calculated from the Loans and Loan Payments records, so there is nothing to type in here. To record a payment use the Loan Payments page.</p>
+
+        <!-- R - Read: one row per loan. total_paid and remaining_balance are calculated in loanrepayments_view. -->
+        <div class="table-section">
+            <h3>Repayment Progress</h3>
+            <!-- This div makes the table scroll horizontally if it becomes too wide -->
+            <div class="table-wrapper">
+                <!-- "table table-striped" gives every other row a light background (see dashboard.css) -->
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Loan</th>
+                            <th>Customer</th>
+                            <th>Loan Product</th>
+                            <th>Status</th>
+                            <th>Loan Amount</th>
+                            <th>Total Paid</th>
+                            <th>Remaining Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loan in loans %}
+                        <tr>
+                            <td>Loan #{{ loan.id }}</td>
+                            <td>{{ loan.loan_request.customer }}</td>
+                            <td>{{ loan.loan_request.loan_product }}</td>
+                            <td>{{ loan.get_loan_status_display }}</td>
+                            <td>{{ loan.loan_request.loan_amount|floatformat:"2g" }}</td>
+                            <td>{{ loan.total_paid|floatformat:"2g" }}</td>
+                            <td>{{ loan.remaining_balance|floatformat:"2g" }}</td>
+                        </tr>
+                        {% empty %}
+                        <!-- this row is shown only when no loans have been recorded yet -->
+                        <tr>
+                            <td colspan="7" class="empty-row">No loans recorded yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

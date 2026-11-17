@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock title %}
+{# the page name shown in the top bar breadcrumb: Pages / ... #}
+{% block breadcrumb %}{{ title }}{% endblock breadcrumb %}
+
+{% block content %}
+    <!--
+        R - Read: the standard records page.
+        This one template is shared by every table. record_list_view sends the column headings and, for each row, the record and the text of each column, so the same HTML works for customers, accounts, loans and the rest.
+    -->
+    <div class="container">
+        <!-- This div holds the page title, the Add New button and the Return to Home button. -->
+        <div class="top-bar">
+            <h2>{{ title }}</h2>
+            <div class="top-actions">
+                <!-- add_page is the name of this table's "add" page, e.g. customer_page -->
+                <a href="{% url add_page %}" class="return-btn add-btn">+ Add New</a>
+                <a href="{% url 'home_page' %}" class="return-btn">Return to Home</a>
+            </div>
+        </div>
+        <p>Every {{ label|lower }} saved in the database. Use the search box to find a record, then click View, Edit or Delete.</p>
+
+        <!-- Search section: a Django form (SearchForm in form.py) sent with GET, so the search words appear in the URL e.g. ?q=john -->
+        <form method="GET" class="search-form">
+            {{ search_form.q }}
+            <button type="submit" class="search-btn">Search</button>
+            {% if search_text %}
+            <!-- this link opens the page without ?q= so every record is shown again -->
+            <a href="{% url 'record_list_page' record_type %}" class="clear-link">Clear search</a>
+            {% endif %}
+        </form>
+
+        <!-- this line tells the user how many records were found -->
+        <p class="result-count">
+            {{ rows|length }} record{{ rows|length|pluralize }}{% if search_text %} matching "{{ search_text }}"{% endif %}
+        </p>
+
+        <!-- This div makes the table scroll horizontally if it becomes too wide -->
+        <div class="table-wrapper">
+            <!-- "table table-striped" are the same class names the lecture used. dashboard.css gives every other row a light background. -->
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        {% for heading in headings %}
+                        <th>{{ heading }}</th>
+                        {% endfor %}
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        <td>{{ row.record.id }}</td>
+                        {% for cell in row.cells %}
+                        <td>{{ cell }}</td>
+                        {% endfor %}
+                        <!-- the include file draws the View / Edit / Delete buttons for this row -->
+                        {% include 'includes/record_actions.html' with record=row.record %}
+                    </tr>
+                    {% empty %}
+                    <!-- this row is shown only when there are no records (or none match the search) -->
+                    <tr>
+                        <td colspan="{{ headings|length|add:2 }}" class="empty-row">
+                            {% if search_text %}No records match your search.{% else %}No {{ label|lower }} records saved yet.{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}

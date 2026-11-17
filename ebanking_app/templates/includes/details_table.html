@@ -1,0 +1,22 @@
+<!--
+    Reusable details table for ONE record.
+    Used by the full details page (record_detail.html) and by the View popup (popup_detail.html), so the same HTML is written only once.
+    record_detail_view sends a list of (heading, value) pairs which are shown one per row.
+-->
+<!-- This div makes the table scroll horizontally if it becomes too wide -->
+<div class="table-wrapper">
+    <table class="table table-striped details-table">
+        <tbody>
+            <tr>
+                <th>ID</th>
+                <td>{{ record.id }}</td>
+            </tr>
+            {% for heading, value in details %}
+            <tr>
+                <th>{{ heading }}</th>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

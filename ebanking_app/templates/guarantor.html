@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Guarantor Details{% endblock title %}
+{# the page name shown in the top bar breadcrumb: Pages / ... #}
+{% block breadcrumb %}Guarantor Details{% endblock breadcrumb %}
+
+{% block content %}
+    <!-- A simple way to explain it: divs are like containers that group related content together so the page has a clear structure. -->
+    <!-- This div keeps the guarantor form in one organized card. The saved records are on a separate records page. -->
+    <div class="container">
+        <!-- This div holds the page title, the View Records button and the Return to Home button. -->
+        <div class="top-bar">
+            <h2>Guarantor Details</h2>
+            <div class="top-actions">
+                <!-- record_type (e.g. 'customer') is sent from the view, so this opens /customer/records/ -->
+                <a href="{% url 'record_list_page' record_type %}" class="return-btn records-btn">View Records</a>
+                <a href="{% url 'home_page' %}" class="return-btn">Return to Home</a>
+            </div>
+        </div>
+        <p>Record details of individuals who act as guarantors for loan applicants.</p>
+
+        <!-- C - Create: this form is built by Django from GuarantorForm in form.py, so its fields always match the Guarantor model. Submitting it saves a new record. -->
+        <form method="POST">
+            {% csrf_token %}
+            {% include 'includes/form_fields.html' %}
+            <button type="submit" class="submit-btn">Save Guarantor Details</button>
+        </form>
+    </div>
+{% endblock content %}

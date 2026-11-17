@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ label }}{% endblock title %}
+{# the page name shown in the top bar breadcrumb: Pages / ... #}
+{% block breadcrumb %}Edit {{ label }}{% endblock breadcrumb %}
+
+{% block content %}
+    <!-- This page is shared by every table. The view sends the form already filled with the record's current values (instance=record). -->
+    <div class="container">
+        <!-- This div holds the page title and the buttons back to this record's details and to the list of records. -->
+        <div class="top-bar">
+            <h2>Edit {{ label }} - {{ record }}</h2>
+            <div class="top-actions">
+                <a href="{% url 'record_detail_page' record_type record.id %}" class="return-btn records-btn">Cancel</a>
+                <a href="{% url 'record_list_page' record_type %}" class="return-btn">Back to Records</a>
+            </div>
+        </div>
+        <p>Change the details below and click Save Changes.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            {% include 'includes/form_fields.html' %}
+            <button type="submit" class="submit-btn">Save Changes</button>
+        </form>
+    </div>
+{% endblock content %}

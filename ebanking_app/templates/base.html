@@ -1,0 +1,173 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- each page can replace the text inside the title block with its own page name -->
+    <title>{% block title %}eBanking System{% endblock title %}</title>
+
+    <!--
+        This is the CSS section shared by every page.
+        Following the Admin Dashboard lecture, the styles now live in the project's static folder (New_System/static/css/) instead of a <style> tag here.
+        The static tag builds the address of each file, e.g. /static/css/style.css. It only works because the "load static" line is the first line of this file.
+          style.css     - fonts, forms, buttons, messages and tables (the rules that were here before)
+          dashboard.css - the sidebar, top bar, stat cards and striped tables
+    -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+    <!-- pages that need extra styles of their own (e.g. the home page cards) add them inside this block -->
+    {% block extra_css %}{% endblock extra_css %}
+</head>
+<!-- the class "with-sidebar" is only added when someone is logged in. dashboard.css uses it to make room for the sidebar, so the login and sign up pages stay full width. -->
+<body class="{% if user.is_authenticated %}with-sidebar{% endif %}">
+
+    {% comment "UNUSED: the old navbar" %}
+    The old navbar at the top of every page. It is replaced by the sidebar and top bar below (Admin Dashboard lecture), so it is commented out instead of deleted.
+    {% if user.is_authenticated %}
+    <nav class="navbar">
+        <a href="{% url 'home_page' %}" class="brand">Banking &amp; Loan Management System</a>
+        <div class="nav-right">
+            <span>Logged in as <strong>{{ user.username }}</strong></span>
+            <form method="POST" action="{% url 'logout_page' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </nav>
+    {% endif %}
+    {% endcomment %}
+
+    <!--
+        Sidebar section:
+        user.is_authenticated is True only when someone is logged in, so the sidebar is hidden on the login and sign up pages.
+        Every link uses the url tag with a route name from urls.py, never a typed path like "../pages/customer.html" (the mistake the lecture's downloaded template had).
+    -->
+    {% if user.is_authenticated %}
+    <!--
+        "with" saves two values so the links below can use short names:
+          page - the name of the current route, e.g. customer_page (request.resolver_match describes the URL that was matched)
+          type - on the shared records pages, the record_type from the URL, e.g. customer
+        A link gets the class "active" (highlighted) when it is the add page OR the records pages of that table.
+    -->
+    {% with page=request.resolver_match.url_name type=request.resolver_match.kwargs.record_type %}
+    <aside class="sidenav" id="sidenav">
+        <!-- This link holds the bank logo and the system name. The logo is in ebanking_app/static/images/, found by the same static tag. -->
+        <a href="{% url 'home_page' %}" class="sidenav-brand">
+            <img src="{% static 'images/e_banking_logo.jpeg' %}" alt="eBanking logo">
+            <span>Banking &amp; Loan Management System</span>
+        </a>
+
+        <!-- This group holds the dashboard link -->
+        <p class="sidenav-heading">Main</p>
+        <ul>
+            <li><a href="{% url 'home_page' %}" class="nav-link {% if page == 'home_page' %}active{% endif %}"><span class="nav-icon">🏠</span>Dashboard</a></li>
+        </ul>
+
+        <!-- This group holds the people and account pages -->
+        <p class="sidenav-heading">Customers &amp; Staff</p>
+        <ul>
+            <li><a href="{% url 'customer_page' %}" class="nav-link {% if page == 'customer_page' or type == 'customer' %}active{% endif %}"><span class="nav-icon">👤</span>Customers</a></li>
+            <li><a href="{% url 'accounts_page' %}" class="nav-link {% if page == 'accounts_page' or type == 'accounts' %}active{% endif %}"><span class="nav-icon">🏦</span>Bank Accounts</a></li>
+            <li><a href="{% url 'guarantor_page' %}" class="nav-link {% if page == 'guarantor_page' or type == 'guarantor' %}active{% endif %}"><span class="nav-icon">🤝</span>Guarantors</a></li>
+            <li><a href="{% url 'bank_staff_page' %}" class="nav-link {% if page == 'bank_staff_page' or type == 'bankstaff' %}active{% endif %}"><span class="nav-icon">👥</span>Bank Staff</a></li>
+        </ul>
+
+        <!-- This group follows a loan from product to repayment -->
+        <p class="sidenav-heading">Loans</p>
+        <ul>
+            <li><a href="{% url 'loan_product_page' %}" class="nav-link {% if page == 'loan_product_page' or type == 'loanproduct' %}active{% endif %}"><span class="nav-icon">📄</span>Loan Products</a></li>
+            <li><a href="{% url 'loan_request_page' %}" class="nav-link {% if page == 'loan_request_page' or type == 'loanrequest' %}active{% endif %}"><span class="nav-icon">📝</span>Loan Requests</a></li>
+            <li><a href="{% url 'loan_view_page' %}" class="nav-link {% if page == 'loan_view_page' or type == 'loans' %}active{% endif %}"><span class="nav-icon">💰</span>Loans</a></li>
+            <li><a href="{% url 'loan_approvals_page' %}" class="nav-link {% if page == 'loan_approvals_page' or type == 'loanapprovals' %}active{% endif %}"><span class="nav-icon">✅</span>Loan Approvals</a></li>
+            <li><a href="{% url 'loan_payment_page' %}" class="nav-link {% if page == 'loan_payment_page' or type == 'loanpayment' %}active{% endif %}"><span class="nav-icon">🧾</span>Loan Payments</a></li>
+            <li><a href="{% url 'loan_repayment_summary_page' %}" class="nav-link {% if page == 'loan_repayment_summary_page' %}active{% endif %}"><span class="nav-icon">📊</span>Repayment Summary</a></li>
+        </ul>
+
+        <!-- This group holds the money movement pages -->
+        <p class="sidenav-heading">Transactions</p>
+        <ul>
+            <li><a href="{% url 'transactions_page' %}" class="nav-link {% if page == 'transactions_page' or type == 'transactions' %}active{% endif %}"><span class="nav-icon">💸</span>Transactions</a></li>
+            <li><a href="{% url 'transaction_types_page' %}" class="nav-link {% if page == 'transaction_types_page' or type == 'transactiontypes' %}active{% endif %}"><span class="nav-icon">⚙️</span>Transaction Types</a></li>
+        </ul>
+    </aside>
+    {% endwith %}
+    {% endif %}
+
+    <!-- This div is the main area to the right of the sidebar -->
+    <div class="main">
+
+        {% if user.is_authenticated %}
+        <!--
+            Top bar section:
+            the breadcrumb on the left shows "Pages / " and the name of this page. Each page fills the breadcrumb block with its own name, just like the title block.
+            The right side shows who is logged in and the Logout button.
+        -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <!-- on small screens the sidebar is hidden, and this button opens it (see static/js/dashboard.js) -->
+                <button type="button" class="menu-toggle" id="menu-toggle">☰ Menu</button>
+                <div class="breadcrumb">
+                    Pages / <strong>{% block breadcrumb %}Dashboard{% endblock breadcrumb %}</strong>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <span>Logged in as <strong>{{ user.username }}</strong></span>
+                <!-- logging out must be a POST request in Django 5, so the Logout button is a small form with its own csrf_token -->
+                <form method="POST" action="{% url 'logout_page' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </header>
+        {% endif %}
+
+        <div class="page">
+            <!-- this shows the one-time messages sent from the views with messages.success() / messages.error() -->
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            <!-- each page that extends this base template puts its own content inside this block -->
+            {% block content %}
+            {% endblock content %}
+        </div>
+    </div>
+
+    {% if user.is_authenticated %}
+    <!--
+        Popup window section:
+        <dialog> is an HTML element for popup windows. It stays hidden until popups.js opens it with showModal(), which also dims the page behind it.
+        The View and Edit popups load their content into popup-body. The Delete popup uses its own small dialog with a fixed question.
+    -->
+    <dialog id="record-popup" class="popup" aria-label="Record">
+        <!-- the X button in the corner closes the popup (the Esc key does too) -->
+        <button type="button" class="popup-close" data-popup-close aria-label="Close">&times;</button>
+        <div id="popup-body" class="popup-inner"></div>
+    </dialog>
+
+    <dialog id="delete-popup" class="popup popup-small" aria-labelledby="delete-popup-title">
+        <!-- the padding is on this inner div, so a click on the dialog itself always means a click outside the white box -->
+        <div class="popup-inner">
+            <h3 id="delete-popup-title">Delete this record?</h3>
+            <!-- popups.js writes the name of the record into this paragraph -->
+            <p id="delete-popup-text"></p>
+            <p class="popup-warning">This cannot be undone.</p>
+            <div class="popup-actions">
+                <button type="button" class="danger-btn" id="delete-popup-confirm">Yes, delete</button>
+                <button type="button" class="return-btn" data-popup-close>Cancel</button>
+            </div>
+        </div>
+    </dialog>
+    {% endif %}
+
+    <!-- the JavaScript files are linked at the bottom so the page HTML (the Menu button, the icons and the popups) already exists when the scripts run -->
+    <script src="{% static 'js/dashboard.js' %}"></script>
+    <script src="{% static 'js/popups.js' %}"></script>
+</body>
+</html>

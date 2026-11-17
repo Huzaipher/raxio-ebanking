@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Transactions Logging{% endblock title %}
+{# the page name shown in the top bar breadcrumb: Pages / ... #}
+{% block breadcrumb %}Transactions Logging{% endblock breadcrumb %}
+
+{% block content %}
+    <!-- A simple way to explain it: divs are like containers that group related content together so the page has a clear structure. -->
+    <!-- This div keeps the transaction form in one organized card. The saved records are on a separate records page. -->
+    <div class="container">
+        <!-- This div holds the page title, the View Records button and the Return to Home button. -->
+        <div class="top-bar">
+            <h2>Transactions Logging</h2>
+            <div class="top-actions">
+                <!-- record_type (e.g. 'customer') is sent from the view, so this opens /customer/records/ -->
+                <a href="{% url 'record_list_page' record_type %}" class="return-btn records-btn">View Records</a>
+                <a href="{% url 'home_page' %}" class="return-btn">Return to Home</a>
+            </div>
+        </div>
+        <p>Log deposits, withdrawals, or transfers associated with bank accounts. The date and time are recorded automatically.</p>
+
+        <!-- C - Create: this form is built by Django from TransactionsForm in form.py, so its fields always match the Transactions model. Submitting it saves a new record. -->
+        <form method="POST">
+            {% csrf_token %}
+            {% include 'includes/form_fields.html' %}
+            <button type="submit" class="submit-btn">Log Transaction</button>
+        </form>
+    </div>
+{% endblock content %}

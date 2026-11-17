@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{# the load static line is not inherited from base.html, so this page loads it again to use the static tag for the logo #}
+{% load static %}
+
+{% block title %}eBanking System - Secure Login{% endblock title %}
+
+{% block extra_css %}
+<style>
+    /* Login Card Container: centered white card */
+    .login-container {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        margin: 40px auto;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    /* Logo Placement: max-width keeps the image inside the card on any screen size */
+    .login-logo {
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        display: block;
+        margin: 0 auto 18px;
+        border-radius: 12px;
+    }
+
+    .login-container h2 {
+        color: #0056b3; /* Bank Blue */
+        margin-bottom: 5px;
+        font-size: 24px;
+        border-bottom: none;
+    }
+
+    .login-container > p {
+        color: #666;
+        margin-bottom: 25px;
+        font-size: 14px;
+    }
+
+    /* the form fields are aligned to the left inside the centered card */
+    .login-container form { text-align: left; }
+
+    /* Submit Button */
+    .btn-login {
+        width: 100%;
+        padding: 12px;
+        background-color: #0056b3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    .btn-login:hover {
+        background-color: #004494;
+    }
+
+    /* Footer Links */
+    .footer-links {
+        margin-top: 25px;
+        font-size: 13px;
+    }
+
+    .footer-links a {
+        color: #0056b3;
+        text-decoration: none;
+    }
+
+    .footer-links a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+    <!-- A simple way to explain it: divs are like containers that group related content together so the page has a clear structure. -->
+    <!-- This div holds the login form and logo together in one centered card. -->
+    <div class="login-container">
+        <!-- the static tag builds the correct URL for a file in the ebanking_app/static folder, here /static/images/e_banking_logo.jpeg -->
+        <img src="{% static 'images/e_banking_logo.jpeg' %}" alt="eBanking Logo" class="login-logo">
+        <h2>eBanking System</h2>
+        <p>Secure Account Access</p>
+
+        <!-- this form is Django's built-in AuthenticationForm sent from login_view. It has a username and a password field. -->
+        <form method="POST" action="{% url 'login_page' %}">
+            {% csrf_token %}
+            {% include 'includes/form_fields.html' with single_column=True %}
+            <!-- next remembers the protected page the user was trying to open, so login_view can send them back there -->
+            <input type="hidden" name="next" value="{{ next }}">
+            <button type="submit" class="btn-login">Secure Login</button>
+        </form>
+
+        <div class="footer-links">
+            Don't have an account? <a href="{% url 'sign_up_page' %}">Sign Up</a>
+        </div>
+    </div>
+{% endblock content %}

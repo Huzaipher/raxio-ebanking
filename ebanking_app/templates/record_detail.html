@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ label }} Details{% endblock title %}
+{# the page name shown in the top bar breadcrumb: Pages / ... #}
+{% block breadcrumb %}{{ label }} Details{% endblock breadcrumb %}
+
+{% block content %}
+    <!--
+        R - Read: the standard details page for ONE record.
+        This template is shared by every table. record_detail_view sends a list of (heading, value) pairs which are shown one per row.
+    -->
+    <div class="container">
+        <!-- This div holds the page title and the Back to Records button. -->
+        <div class="top-bar">
+            <h2>{{ label }} Details - {{ record }}</h2>
+            <div class="top-actions">
+                <a href="{% url 'record_list_page' record_type %}" class="return-btn">Back to Records</a>
+            </div>
+        </div>
+
+        <!-- the details table is in includes/details_table.html, because the View popup on the records page shows the same table -->
+        {% include 'includes/details_table.html' %}
+
+        <!-- U - Update and D - Delete buttons for this record -->
+        <div class="detail-actions">
+            <a href="{% url 'edit_record_page' record_type record.id %}" class="return-btn edit-btn">Edit</a>
+            <!--
+                deleting changes data, so it is sent as a POST form with a csrf_token.
+                data-confirm-delete tells popups.js to show the "Are you sure?" popup first. The text after it is the name shown in that popup.
+            -->
+            <form method="POST" action="{% url 'delete_record_page' record_type record.id %}" data-confirm-delete="{{ label }} {{ record }}">
+                {% csrf_token %}
+                <button type="submit" class="danger-btn">Delete</button>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

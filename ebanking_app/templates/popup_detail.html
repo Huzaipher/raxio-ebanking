@@ -1,0 +1,22 @@
+<!--
+    R - Read inside the popup.
+    This template does NOT extend base.html: record_detail_view sends it when the address ends with ?popup=1, and popups.js places it inside the popup window on the records page.
+-->
+<div class="popup-head">
+    <h3>{{ label }} Details - {{ record }}</h3>
+</div>
+
+{% include 'includes/details_table.html' %}
+
+<!-- This div holds the buttons at the bottom of the popup -->
+<div class="popup-actions">
+    <!-- data-popup makes Edit open in this same popup -->
+    <a href="{% url 'edit_record_page' record_type record.id %}" class="return-btn edit-btn" data-popup>Edit</a>
+    <!-- the same delete form as the row icon, so it also asks "Are you sure?" first -->
+    <form method="POST" action="{% url 'delete_record_page' record_type record.id %}" data-confirm-delete="{{ label }} {{ record }}">
+        {% csrf_token %}
+        <input type="hidden" name="return_to" value="list">
+        <button type="submit" class="danger-btn">Delete</button>
+    </form>
+    <button type="button" class="return-btn" data-popup-close>Close</button>
+</div>
